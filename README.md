@@ -2,6 +2,9 @@
 
 A native music player for Haiku OS.
 
+<img width="578" height="371" alt="grafik" src="https://github.com/user-attachments/assets/07e42d3a-788a-4c2b-be07-dbd08c9da8a2" />
+
+
 ![Haiku](https://img.shields.io/badge/Platform-Haiku-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
