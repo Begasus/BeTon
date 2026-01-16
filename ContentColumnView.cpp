@@ -103,6 +103,12 @@ public:
     }
 
     if (buttons & B_PRIMARY_MOUSE_BUTTON) {
+      int32 clicks = 1;
+      msg->FindInt32("clicks", &clicks);
+      if (clicks >= 2) {
+        return B_DISPATCH_MESSAGE;
+      }
+      
       int32 modifiers = 0;
       if (msg->FindInt32("modifiers", &modifiers) == B_OK) {
         if (modifiers &
