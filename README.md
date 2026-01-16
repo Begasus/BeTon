@@ -14,12 +14,13 @@ A native music player for Haiku.
 *   Audio playback
 *   Playlist creation
 *   MusicBrainz metadata lookup
+*   Color support, just drop a color on the seekbar
 
 ## Development
 
 ## Acknowledgements
 
-*   Special thanks to **zuMi** for providing the brilliant icons, used in this project.
+*   Special thanks to **zuMi** for providing all the brilliant icons, used in this project.
 
 ## Build Requirements
 
@@ -36,6 +37,7 @@ pkgman install taglib_devel libmusicbrainz_devel
 ```bash
 cd BeTon
 make
+make bindcatalogs
 ```
 
 ## Documentation
