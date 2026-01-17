@@ -16,7 +16,7 @@
  */
 SimpleColumnView::SimpleColumnView(const char *name)
     : BView(BRect(0, 0, 1, 1), name, B_FOLLOW_ALL,
-            B_WILL_DRAW | B_FRAME_EVENTS),
+            B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE),
       fCurrentSelection(-1), fUseCustomColor(false) {
   font_height fh;
   be_plain_font->GetHeight(&fh);
@@ -246,6 +246,7 @@ void SimpleColumnView::FrameResized(float width, float height) {
 }
 
 void SimpleColumnView::MouseDown(BPoint where) {
+  MakeFocus(true);
   int32 index = (int32)(where.y / fItemHeight);
 
   if (index >= 0 && index < (int32)fItems.size()) {

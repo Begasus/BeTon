@@ -370,7 +370,7 @@ public:
 };
 
 ContentColumnView::ContentColumnView(const char *name)
-    : BColumnListView(name, B_WILL_DRAW | B_FRAME_EVENTS) {
+    : BColumnListView(name, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE) {
   SetSelectionMode(B_MULTIPLE_SELECTION_LIST);
 
   SetColor(B_COLOR_BACKGROUND, ui_color(B_LIST_BACKGROUND_COLOR));

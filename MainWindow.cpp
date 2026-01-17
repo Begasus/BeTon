@@ -1330,6 +1330,7 @@ void MainWindow::MessageReceived(BMessage *msg) {
 
       fTitleView->SetText(label);
 
+      // Update now-playing indicator in content view
       if (fLibraryManager && fLibraryManager->ContentView()) {
         fLibraryManager->ContentView()->SetNowPlayingPath(path);
       }
@@ -3168,6 +3169,21 @@ void MainWindow::ApplyColors() {
     } else {
       fSeekBar->SetColors(bg, ui_color(B_CONTROL_HIGHLIGHT_COLOR), border);
     }
+
+    if (fSearchField) {
+      if (bgLuminance < 0.5f) {
+        fSearchField->TextView()->SetViewColor(tint_color(panelBg, 0.80f));
+        fSearchField->TextView()->SetLowColor(tint_color(panelBg, 0.80f));
+        fSearchField->TextView()->SetHighColor((rgb_color){220, 220, 220, 255});
+      } else {
+        fSearchField->TextView()->SetViewColor(
+            ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+        fSearchField->TextView()->SetLowColor(
+            ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+        fSearchField->TextView()->SetHighColor(ui_color(B_DOCUMENT_TEXT_COLOR));
+      }
+      fSearchField->TextView()->Invalidate();
+    }
   }
 
   rgb_color selColor =
@@ -3176,8 +3192,6 @@ void MainWindow::ApplyColors() {
                                     : ui_color(B_CONTROL_HIGHLIGHT_COLOR))
           : ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 
-  // Ensure the color is fully opaque to prevent underlying row stripes from
-  // shining through
   selColor.alpha = 255;
 
   if (fLibraryManager && fLibraryManager->ContentView()) {
