@@ -389,8 +389,8 @@ void CacheManager::MessageReceived(BMessage *msg) {
     break;
 
   case MSG_SCAN_DONE: {
-    DEBUG_PRINT("[CacheManager] received MSG_SCAN_DONE (scanners left: %d)\\n",
-                fActiveScanners - 1);
+    DEBUG_PRINT("[CacheManager] received MSG_SCAN_DONE (scanners left: %ld)\\n",
+                (long)(fActiveScanners - 1));
 
     if (--fActiveScanners <= 0) {
       DEBUG_PRINT(

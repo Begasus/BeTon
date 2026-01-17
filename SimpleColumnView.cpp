@@ -6,6 +6,7 @@
 #include <Window.h>
 
 #include <algorithm>
+#include <cinttypes>
 #include <cmath>
 #include <cstdio>
 
@@ -257,8 +258,9 @@ void SimpleColumnView::MessageReceived(BMessage *msg) {
   if (msg->what == B_SIMPLE_DATA) {
     int32 index = CurrentSelection();
     if (index >= 0) {
-      DEBUG_PRINT("[SimpleColumnView] Drop received on index %d (%s)\\n", index,
-                  ItemAt(index).String());
+      DEBUG_PRINT("[SimpleColumnView] Drop received on index %ld"
+                  " (%s)\\n",
+                  (long)index, ItemAt(index).String());
     }
   } else {
     BView::MessageReceived(msg);

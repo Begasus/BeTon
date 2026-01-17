@@ -161,7 +161,7 @@ void SeekBarView::_SeekFromPoint(BPoint where) {
 
 void SeekBarView::MessageReceived(BMessage *msg) {
   // Handle drag-and-drop color from Color Picker
-  if (msg->WasDropped()) { 
+  if (msg->WasDropped()) {
     rgb_color *color;
     ssize_t size;
     if (msg->FindData("RGBColor", B_RGB_COLOR_TYPE, (const void **)&color,

@@ -17,8 +17,8 @@
 #include <String.h>
 #include <TextControl.h>
 #include <algorithm>
+#include <cinttypes>
 #include <stdio.h>
-
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PlaylistListView"
@@ -82,7 +82,7 @@ void PlaylistListView::SelectionChanged(int32 index) {
 
     fTarget.SendMessage(&msg);
 
-    DEBUG_PRINT("[PlaylistListView] SelectionChanged → %d (%s)\n", index,
+    DEBUG_PRINT("[PlaylistListView] SelectionChanged → %ld (%s)\n", (long)index,
                 ItemAt(index).String());
   }
 }
@@ -103,8 +103,8 @@ void PlaylistListView::MessageReceived(BMessage *msg) {
       if (!IsWritableAt(dropIndex)) {
         DEBUG_PRINT(
             "[PlaylistListView] Drop auf nicht beschreibbare Playlist -> "
-            "ignoriert (idx=%d)\n",
-            (int)dropIndex);
+            "ignoriert (idx=%ld)\n",
+            (long)dropIndex);
         SetHoverIndex(-1);
         break;
       }

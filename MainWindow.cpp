@@ -40,6 +40,7 @@
 #include <TranslationUtils.h>
 #include <View.h>
 #include <algorithm>
+#include <cinttypes>
 #include <random>
 #include <taglib/audioproperties.h>
 #include <taglib/fileref.h>
@@ -86,7 +87,7 @@ static BBitmap *LoadIconFromResource(int32 id, float size) {
   const void *data =
       be_app->AppResources()->LoadResource(B_VECTOR_ICON_TYPE, id, &len);
   if (!data || len == 0) {
-    fprintf(stderr, "[MainWindow] Icon-ID %ld not found\n", (long)id);
+    fprintf(stderr, "[MainWindow] Icon-ID %ld nicht gefunden\n", (long)id);
     return nullptr;
   }
 
@@ -95,7 +96,7 @@ static BBitmap *LoadIconFromResource(int32 id, float size) {
   if (BIconUtils::GetVectorIcon(static_cast<const uint8 *>(data), len, bmp) !=
       B_OK) {
     delete bmp;
-    fprintf(stderr, "[MainWindow] Icon-ID %ld: decoding failed\n",
+    fprintf(stderr, "[MainWindow] Icon-ID %ld: Dekodierung fehlgeschlagen\n",
             (long)id);
     return nullptr;
   }
@@ -168,8 +169,8 @@ MainWindow::MainWindow()
   font_height fh;
   be_plain_font->GetHeight(&fh);
   float fontHeight = fh.ascent + fh.descent + fh.leading;
-  float windowWidth = fontHeight * 70;
-  float windowHeight = windowWidth / 1.618f;
+  float windowWidth = fontHeight * 70;       // ~1008px at default font
+  float windowHeight = windowWidth / 1.618f; // Golden ratio
   ResizeTo(windowWidth, windowHeight);
   CenterOnScreen();
   fPlaylistManager->LoadAvailablePlaylists();
@@ -469,9 +470,9 @@ void UpdateScrollbars(BListView *listView) {
  * @param msg The received message.
  */
 void MainWindow::MessageReceived(BMessage *msg) {
-  /*DEBUG_PRINT("Message empfangen: what = '%c%c%c%c'\\n",
-              (msg->what >> 24) & 0xff, (msg->what >> 16) & 0xff,
-              (msg->what >> 8) & 0xff, msg->what & 0xff);*/
+  /*   DEBUG_PRINT("Message empfangen: what = '%c%c%c%c'\\n",
+                 (msg->what >> 24) & 0xff, (msg->what >> 16) & 0xff,
+                 (msg->what >> 8) & 0xff, msg->what & 0xff);*/
 
   switch (msg->what) {
 
@@ -578,8 +579,8 @@ void MainWindow::MessageReceived(BMessage *msg) {
       }
 
       if (!queue.empty()) {
-        DEBUG_PRINT("[Window] MSG_PLAY: start index=%d (queue=%zu)\\n", index,
-                    queue.size());
+        DEBUG_PRINT("[Window] MSG_PLAY: start index=%ld (queue=%zu)\\n",
+                    (long)index, queue.size());
         fController->Stop();
         fController->SetQueue(queue);
         fController->Play(index);
@@ -726,8 +727,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
           }
 
           if (!queue.empty()) {
-            DEBUG_PRINT("[Window] MSG_PLAYPAUSE: start index=%d (queue=%zu)\\n",
-                        index, queue.size());
+            DEBUG_PRINT("[Window] MSG_PLAYPAUSE: start index=%ld"
+                        " (queue=%zu)\\n",
+                        (long)index, queue.size());
             fController->Stop();
             fController->SetQueue(queue);
             fController->Play(index);
@@ -747,8 +749,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
     if (fController && fVolumeSlider) {
       float linear = fVolumeSlider->Value() / 100.0f;
       float vol = linear * linear;
-      DEBUG_PRINT("[MainWindow] Volume slider: %d -> linear %.2f -> exp %.2f\n",
-                  fVolumeSlider->Value(), linear, vol);
+      DEBUG_PRINT("[MainWindow] Volume slider: %ld"
+                  " -> linear %.2f -> exp %.2f\n",
+                  (long)fVolumeSlider->Value(), linear, vol);
       fController->SetVolume(vol);
     }
     break;
@@ -844,12 +847,12 @@ void MainWindow::MessageReceived(BMessage *msg) {
       if (elapsedSec > 0) {
         int32 min = elapsedSec / 60;
         int32 sec = elapsedSec % 60;
-        status.SetToFormat(
-            B_TRANSLATE("Scanning: %d folders, %d files (%02d:%02d)"), dirs,
-            files, min, sec);
+        status.SetToFormat(B_TRANSLATE("Scanning: %ld folders, %ld"
+                                       " files (%02d:%02d)"),
+                           (long)dirs, (long)files, (int)min, (int)sec);
       } else {
-        status.SetToFormat(B_TRANSLATE("Scanning: %d folders, %d files"), dirs,
-                           files);
+        status.SetToFormat(B_TRANSLATE("Scanning: %ld folders, %ld files"),
+                           (long)dirs, (long)files);
       }
       fStatusLabel->SetText(status.String());
     }
@@ -866,8 +869,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
     int32 min = elapsedSec / 60;
     int32 sec = elapsedSec % 60;
 
-    status.SetToFormat(B_TRANSLATE("Scan completed in %02d:%02d, %d new files"),
-                       min, sec, fNewFilesCount);
+    status.SetToFormat(
+        B_TRANSLATE("Scan completed in %02d:%02d, %ld new files"), (int)min,
+        (int)sec, (long)fNewFilesCount);
     UpdateStatus(status.String(), false);
 
     if (fCacheManager) {
@@ -909,8 +913,8 @@ void MainWindow::MessageReceived(BMessage *msg) {
     }
 
     char buf[128];
-    snprintf(buf, sizeof(buf), B_TRANSLATE("Loading cache... %d/%zu"),
-             fCurrentIndex, fPendingItems.size());
+    snprintf(buf, sizeof(buf), B_TRANSLATE("Loading cache... %ld/%zu"),
+             (long)fCurrentIndex, fPendingItems.size());
     fStatusLabel->SetText(buf);
     break;
   }
@@ -1063,7 +1067,7 @@ void MainWindow::MessageReceived(BMessage *msg) {
       fflush(stdout);
       break; // Not an internal drag
     }
-    printf("[MainWindow] source_index=%d\\n", sourceIndex);
+    printf("[MainWindow] source_index=%ld\\n", (long)sourceIndex);
     fflush(stdout);
 
     int32 playlistIdx = fPlaylistManager->View()->CurrentSelection();
@@ -1137,7 +1141,7 @@ void MainWindow::MessageReceived(BMessage *msg) {
     }
 
     if (!queue.empty()) {
-      DEBUG_PRINT("[Window] MSG_PLAY_BTN: restart sel=%d\\n", sel);
+      DEBUG_PRINT("[Window] MSG_PLAY_BTN: restart sel=%ld\\n", (long)sel);
       fController->Stop();
       fController->SetQueue(queue);
       fController->Play(sel);
@@ -1577,8 +1581,8 @@ void MainWindow::MessageReceived(BMessage *msg) {
       break;
 
     if (!fPlaylistManager->IsPlaylistWritable(playlist)) {
-      DEBUG_PRINT("[MainWindow] addp rejected: Playlist '%s' is not "
-                  "writeable\\n",
+      DEBUG_PRINT("[MainWindow] addp abgelehnt: Playlist '%s' ist nicht "
+                  "beschreibbar\\n",
                   playlist.String());
       break;
     }
@@ -1590,8 +1594,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
       if (path.IsEmpty())
         continue;
 
-      DEBUG_PRINT("[MainWindow] addp: Index=%d, Playlist=%s, Pfad=%s\\n", index,
-                  playlist.String(), path.String());
+      DEBUG_PRINT("[MainWindow] addp: Index=%ld"
+                  ", Playlist=%s, Pfad=%s\\n",
+                  (long)index, playlist.String(), path.String());
 
       AddItemToPlaylist(path, playlist);
       hadAny = true;
@@ -1602,9 +1607,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
       if (path.IsEmpty())
         break;
 
-      DEBUG_PRINT(
-          "[MainWindow] addp(single): Index=%d, Playlist=%s, Pfad=%s\\n", index,
-          playlist.String(), path.String());
+      DEBUG_PRINT("[MainWindow] addp(single): Index=%ld"
+                  ", Playlist=%s, Pfad=%s\\n",
+                  (long)index, playlist.String(), path.String());
 
       AddItemToPlaylist(path, playlist);
     }
@@ -1669,8 +1674,8 @@ void MainWindow::MessageReceived(BMessage *msg) {
 
     if (files.empty()) {
       DEBUG_PRINT(
-          "[Properties] No Paths in MSG_PROPERTIES (file/refs + Selection "
-          "empty)\\n");
+          "[Properties] Keine Pfade in MSG_PROPERTIES (file/refs + Auswahl "
+          "leer)\\n");
       break;
     }
 
@@ -1712,8 +1717,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
     BMessage filesMsg;
     if (msg->FindMessage("files", &filesMsg) == B_OK) {
       fPendingPlaylistFiles = filesMsg;
-      DEBUG_PRINT("[MainWindow] %d Files for new Playlist buffered\\n",
-                  filesMsg.CountNames(B_REF_TYPE));
+      DEBUG_PRINT("[MainWindow] %ld"
+                  " Dateien für neue Playlist gepuffert\\n",
+                  (long)filesMsg.CountNames(B_REF_TYPE));
     }
 
     NamePrompt *prompt = new NamePrompt(BMessenger(this));
@@ -1832,7 +1838,7 @@ void MainWindow::MessageReceived(BMessage *msg) {
 
         BEntry entry(oldPath.Path());
         if (entry.Exists() && entry.Rename(newPath.Path()) == B_OK) {
-          DEBUG_PRINT("[MainWindow] Playlist '%s' → '%s' renamed\\n",
+          DEBUG_PRINT("[MainWindow] Playlist '%s' → '%s' umbenannt\\n",
                       oldName.String(), newName.String());
 
           fPlaylistManager->RenamePlaylist(oldName, newName);
@@ -1877,8 +1883,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
         return;
       }
 
-      DEBUG_PRINT("[MainWindow] Thread running SearchRecording... Gen=%d\\n",
-                  gen);
+      DEBUG_PRINT("[MainWindow] Thread running SearchRecording... Gen=%ld"
+                  "\\n",
+                  (long)gen);
       auto abortCheck = [this, gen]() { return fMbSearchGeneration != gen; };
       std::vector<MBHit> hits =
           fMbClient->SearchRecording(artist, title, album, abortCheck);
@@ -2010,8 +2017,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
       msg->FindMessenger("replyTo", &replyTo);
 
       DEBUG_PRINT(
-          "[MainWindow] MB Search Complete. Hits: %zu. ReplyTo Valid: %d\\n",
-          hits->size(), replyTo.IsValid());
+          "[MainWindow] MB Search Complete. Hits: %zu. ReplyTo Valid: %ld"
+          "\\n",
+          hits->size(), (long)(int32)replyTo.IsValid());
 
       if (replyTo.IsValid()) {
 
@@ -2050,8 +2058,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
         }
         status_t err = replyTo.SendMessage(&resp);
         DEBUG_PRINT(
-            "[MainWindow] Sent MB Results to PropertiesWindow. Error: %d\\n",
-            err);
+            "[MainWindow] Sent MB Results to PropertiesWindow. Error: %ld"
+            "\\n",
+            (long)err);
       }
       delete hits;
     }
@@ -2336,14 +2345,16 @@ void MainWindow::MessageReceived(BMessage *msg) {
           BMessenger(this).SendMessage(&statusMsg);
 
         } else {
-          DEBUG_PRINT("[MainWindow] Auto-Match NOT confident (Mismatch=%d, "
-                      "Matched=%d/%zu). Opening MatcherWindow.\n",
+          DEBUG_PRINT("[MainWindow] Auto-Match NOT confident (Mismatch=%" PRId32
+                      ", "
+                      "Matched=%" PRId32 "/%zu). Opening MatcherWindow.\n",
                       durationMismatch, filesMatched, files.size());
 
           std::vector<MatcherTrackInfo> trackInfos;
           for (const auto &t : rel.tracks) {
             BString dur;
-            dur.SetToFormat("%d:%02d", t.length / 60, t.length % 60);
+            dur.SetToFormat("%d:%02d", (int)(t.length / 60),
+                            (int)(t.length % 60));
             trackInfos.push_back({t.title, dur, (int)t.track});
           }
 
@@ -2411,9 +2422,9 @@ void MainWindow::MessageReceived(BMessage *msg) {
           update.AddString("genre", td.genre);
           update.AddInt32("year", td.year);
 
-          DEBUG_PRINT(
-              "[MainWindow] MSG_MEDIA_ITEM_FOUND sending (Path=%s, Year=%d)\n",
-              path.String(), td.year);
+          DEBUG_PRINT("[MainWindow] MSG_MEDIA_ITEM_FOUND sending (Path=%s, "
+                      "Year=%lu)\n",
+                      path.String(), (unsigned long)td.year);
 
           BMessenger(this).SendMessage(&update);
           if (fCacheManager) {
@@ -2456,8 +2467,8 @@ void MainWindow::MessageReceived(BMessage *msg) {
 
     int32 gen = fMbSearchGeneration;
     LaunchThread("CoverFetchMB", [this, path, replyTo, gen]() {
-      DEBUG_PRINT("[MainWindow] MB Thread started for %s (Gen=%d)\\n",
-                  path.String(), gen);
+      DEBUG_PRINT("[MainWindow] MB Thread started for %s (Gen=%ld)\\n",
+                  path.String(), (long)gen);
       if (!fMbClient) {
         DEBUG_PRINT("[MainWindow] fMbClient is NULL!\\n");
         return;
@@ -2585,7 +2596,7 @@ void MainWindow::MessageReceived(BMessage *msg) {
         fPlaylistManager->LoadAvailablePlaylists();
         SaveSettings();
         BString statusMsg;
-        statusMsg.SetToFormat(B_TRANSLATE("Playlist-Folder set to: %s"),
+        statusMsg.SetToFormat(B_TRANSLATE("Playlist-Ordner gesetzt: %s"),
                               fPlaylistPath.String());
         UpdateStatus(statusMsg);
       }
@@ -2728,7 +2739,7 @@ void MainWindow::MessageReceived(BMessage *msg) {
     fPlaylistManager->SavePlaylist(name, paths);
 
     BString statusMsg;
-    statusMsg.SetToFormat(B_TRANSLATE("Playlist '%s' created"), name.String());
+    statusMsg.SetToFormat(B_TRANSLATE("Playlist '%s' erstellt"), name.String());
     if (shuffle)
       statusMsg << " " << B_TRANSLATE("(Gemischt)");
     if (limitMode > 0)
@@ -2755,13 +2766,13 @@ void MainWindow::MessageReceived(BMessage *msg) {
         int32 m = (duration % 3600) / 60;
         int32 s = duration % 60;
         if (h > 0)
-          text.SetToFormat(B_TRANSLATE("%d Titel. Gesamtdauer %02d:%02d:%02d"),
-                           count, h, m, s);
+          text.SetToFormat(B_TRANSLATE("%ld Titel. Gesamtdauer %02d:%02d:%02d"),
+                           (long)count, (int)h, (int)m, (int)s);
         else
-          text.SetToFormat(B_TRANSLATE("%d Titel. Gesamtdauer %02d:%02d"),
-                           count, m, s);
+          text.SetToFormat(B_TRANSLATE("%ld Titel. Gesamtdauer %02d:%02d"),
+                           (long)count, (int)m, (int)s);
       } else {
-        text.SetToFormat(B_TRANSLATE("%d tracks"), count);
+        text.SetToFormat(B_TRANSLATE("%ld tracks"), (long)count);
       }
       fStatusLabel->SetText(text.String());
     }
@@ -2991,11 +3002,11 @@ void MainWindow::_UpdateStatusLibrary() {
 
   BString s;
   if (hours > 0)
-    s.SetToFormat(B_TRANSLATE("%d tracks. Total duration %02d:%02d:%02d"),
-                  count, hours, mins, secs);
+    s.SetToFormat(B_TRANSLATE("%ld tracks. Total duration %02d:%02d:%02d"),
+                  (long)count, (int)hours, (int)mins, (int)secs);
   else
-    s.SetToFormat(B_TRANSLATE("%d tracks. Total duration %02d:%02d"), count,
-                  mins, secs);
+    s.SetToFormat(B_TRANSLATE("%ld tracks. Total duration %02d:%02d"),
+                  (long)count, (int)mins, (int)secs);
 
   UpdateStatus(s.String(), true);
 }
@@ -3161,6 +3172,10 @@ void MainWindow::ApplyColors() {
                                     : ui_color(B_CONTROL_HIGHLIGHT_COLOR))
           : ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 
+  // Ensure the color is fully opaque to prevent underlying row stripes from
+  // shining through
+  selColor.alpha = 255;
+
   if (fLibraryManager && fLibraryManager->ContentView()) {
     ContentColumnView *cv = fLibraryManager->ContentView();
     cv->SetColor(B_COLOR_SELECTION, selColor);
@@ -3186,4 +3201,3 @@ void MainWindow::ApplyColors() {
     fPlaylistManager->View()->SetSelectionColor(selColor);
   }
 }
-

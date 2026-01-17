@@ -140,9 +140,9 @@ void MediaPlaybackController::Play(size_t trackIndex) {
   }
 
   const media_raw_audio_format &raf = mf.u.raw_audio;
-  DEBUG_PRINT("[Play2] decoded: rate=%.0f Hz, channels=%d, format=0x%x, "
+  DEBUG_PRINT("[Play2] decoded: rate=%.0f Hz, channels=%d, format=0x%lx, "
               "byte_order=%s, buffer=%ld\n",
-              raf.frame_rate, (int)raf.channel_count, raf.format,
+              raf.frame_rate, (int)raf.channel_count, (unsigned long)raf.format,
               raf.byte_order == B_MEDIA_BIG_ENDIAN ? "BE" : "LE",
               (long)raf.buffer_size);
 

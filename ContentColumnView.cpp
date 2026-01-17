@@ -14,6 +14,7 @@
 #include <PopUpMenu.h>
 #include <View.h>
 #include <Window.h>
+#include <cinttypes>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ContentColumnView"
@@ -103,12 +104,13 @@ public:
     }
 
     if (buttons & B_PRIMARY_MOUSE_BUTTON) {
+      // Let double-clicks pass through immediately for invocation
       int32 clicks = 1;
       msg->FindInt32("clicks", &clicks);
       if (clicks >= 2) {
         return B_DISPATCH_MESSAGE;
       }
-      
+
       int32 modifiers = 0;
       if (msg->FindInt32("modifiers", &modifiers) == B_OK) {
         if (modifiers &
@@ -197,8 +199,9 @@ public:
         targetRow ? fOwner->IndexOf(targetRow) : fOwner->CountRows() - 1;
     int32 sourceIndex = fOwner->fDragSourceIndex;
 
-    printf("[DropFilter] Drop detected: source=%d, target=%d\n", sourceIndex,
-           targetIndex);
+    printf("[DropFilter] Drop detected: source=%ld, target=%ld"
+           "\n",
+           (long)sourceIndex, (long)targetIndex);
     fflush(stdout);
 
     if (sourceIndex != targetIndex && sourceIndex >= 0 && targetIndex >= 0) {
@@ -405,7 +408,7 @@ void ContentColumnView::AddEntry(const MediaItem &mi) {
   BString durStr;
   int32 min = mi.duration / 60;
   int32 sec = mi.duration % 60;
-  durStr.SetToFormat("%d:%02d", min, sec);
+  durStr.SetToFormat("%ld:%02ld", (long)min, (long)sec);
   row->SetField(new StatusStringField(durStr, m), 6);
 
   row->SetField(new StatusIntegerField(mi.track, m), 7);
@@ -690,8 +693,9 @@ void ContentColumnView::MessageReceived(BMessage *msg) {
   }
 
   case B_SIMPLE_DATA: {
-    printf("[ContentColumnView] B_SIMPLE_DATA received, fDragSourceIndex=%d\\n",
-           fDragSourceIndex);
+    printf("[ContentColumnView] B_SIMPLE_DATA received, fDragSourceIndex=%ld"
+           "\\n",
+           (long)fDragSourceIndex);
     printf("[ContentColumnView] fLastDropPoint=(%f,%f)\\n", fLastDropPoint.x,
            fLastDropPoint.y);
     fflush(stdout);
@@ -708,8 +712,9 @@ void ContentColumnView::MessageReceived(BMessage *msg) {
 
     BRow *targetRow = RowAt(fLastDropPoint);
     int32 targetIndex = targetRow ? IndexOf(targetRow) : CountRows() - 1;
-    printf("[ContentColumnView] sourceIndex=%d, targetIndex=%d\\n", sourceIndex,
-           targetIndex);
+    printf("[ContentColumnView] sourceIndex=%ld, targetIndex=%ld"
+           "\\n",
+           (long)sourceIndex, (long)targetIndex);
     fflush(stdout);
 
     if (sourceIndex == targetIndex || sourceIndex < 0 || targetIndex < 0)

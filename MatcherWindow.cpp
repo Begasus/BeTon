@@ -19,9 +19,11 @@
 #include <StringView.h>
 #include <View.h>
 #include <algorithm>
+#include <cinttypes>
 #include <ctype.h>
 #include <stdio.h>
 #include <vector>
+
 
 #include <Catalog.h>
 
@@ -183,7 +185,7 @@ void MatcherWindow::_BuildUI() {
   for (size_t i = 0; i < orderedTracks.size(); i++) {
     BString label;
     if (orderedTracks[i]) {
-      label.SetToFormat("%d. %s (%s)", orderedTracks[i]->index,
+      label.SetToFormat("%" PRId32 ". %s (%s)", orderedTracks[i]->index,
                         orderedTracks[i]->name.String(),
                         orderedTracks[i]->duration.String());
       fTrackListView->AddItem(
@@ -201,7 +203,7 @@ void MatcherWindow::_BuildUI() {
     if (!trackUsed[i]) {
       const auto &t = fTracks[i];
       BString label;
-      label.SetToFormat("%d. %s (%s)", t.index, t.name.String(),
+      label.SetToFormat("%" PRId32 ". %s (%s)", t.index, t.name.String(),
                         t.duration.String());
       fTrackListView->AddItem(new TrackListItem(
           label.String(), const_cast<MatcherTrackInfo *>(&t)));
@@ -545,7 +547,7 @@ void MatcherWindow::_SmartMatch() {
   for (size_t i = 0; i < assignments.size(); i++) {
     if (assignments[i]) {
       BString label;
-      label.SetToFormat("%d. %s (%s)", assignments[i]->index,
+      label.SetToFormat("%" PRId32 ". %s (%s)", assignments[i]->index,
                         assignments[i]->name.String(),
                         assignments[i]->duration.String());
       fTrackListView->AddItem(
@@ -565,7 +567,7 @@ void MatcherWindow::_SmartMatch() {
     if (!trackUsed[k]) {
       const auto &t = fTracks[k];
       BString label;
-      label.SetToFormat("%d. %s (%s)", t.index, t.name.String(),
+      label.SetToFormat("%" PRId32 ". %s (%s)", t.index, t.name.String(),
                         t.duration.String());
       fTrackListView->AddItem(new TrackListItem(
           label.String(), const_cast<MatcherTrackInfo *>(&t)));

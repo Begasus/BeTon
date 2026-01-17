@@ -25,6 +25,7 @@
 #include <TranslationUtils.h>
 #include <View.h>
 #include <Window.h>
+#include <cinttypes>
 #include <cstdio>
 #include <memory>
 #include <new>
@@ -774,7 +775,7 @@ void PropertiesWindow::MessageReceived(BMessage *msg) {
 
         i++;
       }
-      printf("[PropertiesWindow] Added %d items.\n", i);
+      printf("[PropertiesWindow] Added %ld items.\n", (long)i);
     } else {
       printf("[PropertiesWindow] Error: fMbResults is NULL!\n");
     }
@@ -1043,17 +1044,25 @@ void PropertiesWindow::_LoadInitialData() {
     if (fEdComposer)
       fEdComposer->SetText(td.composer.String());
     if (fEdYear)
-      fEdYear->SetText(td.year ? BString().SetToFormat("%u", td.year) : "");
+      fEdYear->SetText(
+          td.year ? BString().SetToFormat("%lu", (unsigned long)td.year) : "");
     if (fEdTrack)
-      fEdTrack->SetText(td.track ? BString().SetToFormat("%u", td.track) : "");
+      fEdTrack->SetText(
+          td.track ? BString().SetToFormat("%lu", (unsigned long)td.track)
+                   : "");
     if (fEdTrackTotal)
       fEdTrackTotal->SetText(
-          td.trackTotal ? BString().SetToFormat("%u", td.trackTotal) : "");
+          td.trackTotal
+              ? BString().SetToFormat("%lu", (unsigned long)td.trackTotal)
+              : "");
     if (fEdDisc)
-      fEdDisc->SetText(td.disc ? BString().SetToFormat("%u", td.disc) : "");
+      fEdDisc->SetText(
+          td.disc ? BString().SetToFormat("%lu", (unsigned long)td.disc) : "");
     if (fEdDiscTotal)
       fEdDiscTotal->SetText(
-          td.discTotal ? BString().SetToFormat("%u", td.discTotal) : "");
+          td.discTotal
+              ? BString().SetToFormat("%lu", (unsigned long)td.discTotal)
+              : "");
     if (fEdGenre)
       fEdGenre->SetText(td.genre.String());
     if (fEdComment && !td.comment.IsEmpty())
@@ -1190,7 +1199,7 @@ void PropertiesWindow::_LoadInitialDataMulti() {
     case FieldState::AllSame: {
       ed->SetEnabled(true);
       BString s;
-      s.SetToFormat("%u", common);
+      s.SetToFormat("%lu", (unsigned long)common);
       if (common == 0)
         s = "";
       ed->SetText(s.String());
